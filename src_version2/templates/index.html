@@ -1,30 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Simulation Page (With Body)</title>
+    <title>Checkboxes and Input Transfer</title>
+    <style>
+        .container {
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        async function sendWebhookRequest(port, username, checkboxes) {
+            const webhookUrl = `http://127.0.0.1:${port}/${username}`;
+            const webhookData = {
+                "checkboxes": checkboxes,
+                "port": port,
+                "username": username
+            };
+
+            const response = await fetch(webhookUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(webhookData)
+            });
+
+            if (response.status === 200) {
+                console.log("성공");
+            } else {
+                console.log("실패");
+            }
+        }
+    </script>
 </head>
 <body>
-    <h1>Simulation Page (With Body)</h1>
-    <form action="/start_simulation" method="post">
-        <label for="route_path">Route_path:</label>
-        <input type="text" id="route_path" name="route_path" required><br>
-        <label for="data">Data:</label>
-        <input type="text" id="data" name="data" required><br>
-        <button type="submit">시뮬레이션 실행</button>
+    <h1>Checkboxes and Input Transfer</h1>
+    <form id="checkForm">
+        <div class="container">
+            <input type="checkbox" id="A" name="checkbox" value="A">
+            <label for="A">A</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="B" name="checkbox" value="B">
+            <label for="B">B</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="C" name="checkbox" value="C">
+            <label for="C">C</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="D" name="checkbox" value="D">
+            <label for="D">D</label>
+        </div>
+        <div class="container">
+            <label for="port">Port number:</label>
+            <input type="number" id="port" name="port" required>
+        </div>
+        <div class="container">
+            <label for="username">Name:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <button type="submit">Run</button>
     </form>
-    <div id="result"></div>
     <script>
-        document.querySelector("form").onsubmit = async function(event) {
+        document.getElementById("checkForm").onsubmit = async function(event) {
             event.preventDefault();
+
             const formData = new FormData(event.target);
-            const route_path = formData.get("route_path");
-            const data = formData.get("data");
+            const checkboxes = formData.getAll("checkbox");
+            const port = formData.get("port");
+            const username = formData.get("username");
+
+            // 웹훅 요청을 보냅니다.
+            await sendWebhookRequest(port, username, checkboxes);
+
+            const sendData = {
+                checkboxes: checkboxes,
+                port: port,
+                username: username
+            };
+
             const response = await fetch("/start_simulation", {
                 method: "POST",
-                body: new URLSearchParams(formData)
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(sendData)
             });
-            const result = await response.json();
-            document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+
+            if (response.ok) {
+                alert("Data sent successfully!");
+            } else {
+                alert("Error: Could not send data!");
+            }
         }
     </script>
 </body>
