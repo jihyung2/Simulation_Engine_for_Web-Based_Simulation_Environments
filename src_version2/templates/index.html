@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simulation Page (With Body)</title>
+</head>
+<body>
+    <h1>Simulation Page (With Body)</h1>
+    <form action="/start_simulation" method="post">
+        <label for="route_path">Route_path:</label>
+        <input type="text" id="route_path" name="route_path" required><br>
+        <label for="data">Data:</label>
+        <input type="text" id="data" name="data" required><br>
+        <button type="submit">시뮬레이션 실행</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        document.querySelector("form").onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const route_path = formData.get("route_path");
+            const data = formData.get("data");
+            const response = await fetch("/start_simulation", {
+                method: "POST",
+                body: new URLSearchParams(formData)
+            });
+            const result = await response.json();
+            document.getElementById("result").innerText = JSON.stringify(result, null, 2);
+        }
+    </script>
+</body>
+</html>
