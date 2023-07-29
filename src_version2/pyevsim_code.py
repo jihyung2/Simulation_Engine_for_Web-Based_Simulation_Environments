@@ -1,6 +1,11 @@
+import asyncio
 import time
 import datetime
+from asyncio import ensure_future, get_event_loop
+from concurrent.futures import ThreadPoolExecutor
+from threading import Thread
 
+import aiohttp
 import requests
 from fastapi import FastAPI, Request, Form, APIRouter
 from pyevsim import BehaviorModelExecutor, Infinite, SystemSimulator
@@ -14,56 +19,60 @@ a = "dummy data"
 #이벤트 기반 시뮬레이션
 class MyRouter(BehaviorModelExecutor):
     def __init__(self, instance_time, destruct_time, name, engine_name):
-        BehaviorModelExecutor.__init__(self, instance_time, destruct_time, name, engine_name)
+        super().__init__(instance_time, destruct_time, name, engine_name)
         self.init_state("Wait")
         self.insert_state("Wait", Infinite)
-        self.insert_state(a,1)
+        self.insert_state(a, 1)
         self.insert_state("simulation Start", 1)
-
 
     def ext_trans(self, port, msg):
         if port == "start":
             self._cur_state = "simulation Start"
-            # API 요청 처리 및 상태 변경
-
-
 
     def output(self):
         now = datetime.datetime.now()
         self.index = 0
         self.item_list = []
         print("==========================")
-        for i in range(len(self.menu)):
-            self._cur_state, self.temp = self.int_trans()
-            self.item_list.append(int(self.temp))
-            self.index += 1
 
-        print(self.menu)
-        print(self.item_list)
-        print(now)
-        self.web_hook_send(realdata)
-        self.put_db(self.item_list)
+        if hasattr(self, "menu"):
+            for i in range(len(self.menu)):
+                self._cur_state, self.temp = self.int_trans()
+                self.item_list.append(int(self.temp))
+                self.index += 1
+
+            print(self.menu)
+            print(self.item_list)
+            print(now)
+            self.put_db(self.item_list)
+
+        else:
+            print("메뉴가 아직 생성되지 않았습니다.")
+
         self.item_list = []
         self.index = 0
 
+        def sync_webhook_send(request_data):
+            now = datetime.datetime.now()
+            webhook_url = f"http://127.0.0.1:{request_data.port}/{request_data.username}"
+            webhook_data = request_data.dict()
+            print(webhook_url)
+            try:
+                response = requests.post(webhook_url, json=webhook_data)
+                if response.status_code == 200:
+                    print("성공")
+                else:
+                    print("실패")
+            except Exception as e:
+                print(f"웹훅 요청 중 오류 발생: {e}")
 
-        #if self._cur_state == "API":
-            # API 요청에 대한 처리 결과 반환
-            #return {"message": "This is the response for API request"}
+        thread = Thread(target=sync_webhook_send, args=(realdata,))
+        thread.start()
+        thread.join()
 
-        #else:
-            # 잘못된 API 요청 처리
-            #return {"message": "Invalid API request"}
-    def web_hook_send(self, request_data):
-        webhook_url = f"http://127.0.0.1:{request_data.port}/{request_data.username}"
-        webhook_data = request_data.dict()
-        print(webhook_url)
-        response = requests.post(webhook_url, json = webhook_data)
+    # 비동기 웹훅 요청 함수 (async def web_hook_send)를 제거합니다
 
-        if response.status_code == 200:
-            print("성공")
-        else:
-            print("실패")
+
 
     def insert_list(self, arr):
         setattr(self, "menu", arr)
@@ -82,7 +91,7 @@ class MyRouter(BehaviorModelExecutor):
             else:
                 return self.menu[self.index], 0
 
-    def simulate(self, request_data):
+    async def simulate(self, request_data):
         global a
         global realdata
         realdata = request_data
@@ -97,13 +106,12 @@ class MyRouter(BehaviorModelExecutor):
         ss.get_engine("first").register_entity(gen)
         ss.get_engine("first").coupling_relation(None, "start", gen, "start")
         ss.get_engine("first").insert_external_event("start", None)
-        ss.get_engine("first").simulate()
+        self.output()
+        await ss.get_engine("first").simulate()
 
-    def clear_data(self):
+    async def clear_data(self):
         ss = SystemSimulator()
         ss.register_engine("api", "DISCRETE_EVENT", 1)
 
-    def destruct(self):
-        #미완성
-        self.clear_data()
-
+    async def destruct(self):
+        await self.clear_data()

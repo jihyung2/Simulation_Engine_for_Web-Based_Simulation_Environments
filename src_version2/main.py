@@ -1,3 +1,4 @@
+import asyncio
 import importlib
 
 from fastapi import FastAPI, Body, WebSocket, WebSocketDisconnect, websockets
@@ -21,21 +22,30 @@ class WebData(BaseModel):
     checkboxes: List[str]
     port: int
     username: str
+class WebhookData(BaseModel):
+    checkboxes: List[str]
+    port: int
+    username: str
+@app.get("/", response_class=HTMLResponse)
+async def get_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/start_simulation")
 async def start_simulation(data: WebData):
     # 웹훅을 사용하여 시뮬레이션 처리를 시작합니다.
     print(data)
-    my_router.simulate(data)
-    web_hook_receive(data)
-    if __name__ == "__main__":
-        import uvicorn
-        uvicorn.run(app, host="127.0.0.1", port=8700)
+    url = f"http://localhost:{data.port}/{data.username}"
+    await my_router.simulate(data)
+    print("pass!")
+    return {"redirect_url" : url}
 
-@app.post("/{data.username}")
-async def web_hook_receive(data):
+@app.post("/{username}")
+async def receive_webhook(data):
+    print("232323")
+    print(data)
+    # 필요한 처리를 수행한 후 응답을 반환합니다.
+    return {"status": "success"}
 
-
-    if __name__ == "__main__":
-        import uvicorn
-        uvicorn.run(app, host="127.0.0.1", port=data.port)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8700)

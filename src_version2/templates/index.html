@@ -7,30 +7,6 @@
             margin-bottom: 10px;
         }
     </style>
-    <script>
-        async function sendWebhookRequest(port, username, checkboxes) {
-            const webhookUrl = `http://127.0.0.1:${port}/${username}`;
-            const webhookData = {
-                "checkboxes": checkboxes,
-                "port": port,
-                "username": username
-            };
-
-            const response = await fetch(webhookUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(webhookData)
-            });
-
-            if (response.status === 200) {
-                console.log("성공");
-            } else {
-                console.log("실패");
-            }
-        }
-    </script>
 </head>
 <body>
     <h1>Checkboxes and Input Transfer</h1>
@@ -61,38 +37,18 @@
         </div>
         <button type="submit">Run</button>
     </form>
+
     <script>
-        document.getElementById("checkForm").onsubmit = async function(event) {
+        document.getElementById("checkForm").onsubmit = function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
-            const checkboxes = formData.getAll("checkbox");
             const port = formData.get("port");
             const username = formData.get("username");
 
-            // 웹훅 요청을 보냅니다.
-            await sendWebhookRequest(port, username, checkboxes);
-
-            const sendData = {
-                checkboxes: checkboxes,
-                port: port,
-                username: username
-            };
-
-            const response = await fetch("/start_simulation", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(sendData)
-            });
-
-            if (response.ok) {
-                alert("Data sent successfully!");
-            } else {
-                alert("Error: Could not send data!");
-            }
-        }
+            const redirect_url = `http://localhost:${port}/${username}`;
+            window.location.href = redirect_url;
+        };
     </script>
 </body>
 </html>
