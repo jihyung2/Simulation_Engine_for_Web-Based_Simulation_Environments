@@ -1,9 +1,12 @@
 import asyncio
+import http
+import json
 import time
 import datetime
 from asyncio import ensure_future, get_event_loop
 from concurrent.futures import ThreadPoolExecutor
 from threading import Thread
+from urllib.parse import urlparse
 
 import aiohttp
 import requests
@@ -16,7 +19,6 @@ global a
 global realdata
 a = "dummy data"
 
-#이벤트 기반 시뮬레이션
 class MyRouter(BehaviorModelExecutor):
     def __init__(self, instance_time, destruct_time, name, engine_name):
         super().__init__(instance_time, destruct_time, name, engine_name)
@@ -52,27 +54,26 @@ class MyRouter(BehaviorModelExecutor):
         self.item_list = []
         self.index = 0
 
-        def sync_webhook_send(request_data):
-            now = datetime.datetime.now()
-            webhook_url = f"http://127.0.0.1:{request_data.port}/{request_data.username}"
-            webhook_data = request_data.dict()
-            print(webhook_url)
+    async def async_webhook_send(self, request_data):
+        now = datetime.datetime.now()
+        webhook_url = f"http://127.0.0.1:{request_data.port}/{request_data.username}"
+        webhook_data = request_data.dict()
+        webhook_data["time"] = now
+        print(webhook_data)
+
+        parsed_url = urlparse(webhook_url)
+        async with aiohttp.ClientSession() as session:
             try:
-                response = requests.post(webhook_url, json=webhook_data)
-                if response.status_code == 200:
-                    print("성공")
-                else:
-                    print("실패")
+                headers = {
+                    'Content-Type': 'application/json'
+                }
+                async with session.post(webhook_url,json=webhook_data, headers=headers) as response:
+                    if response.status == 200:
+                        print("성공")
+                    else:
+                        print("실패")
             except Exception as e:
                 print(f"웹훅 요청 중 오류 발생: {e}")
-
-        thread = Thread(target=sync_webhook_send, args=(realdata,))
-        thread.start()
-        thread.join()
-
-    # 비동기 웹훅 요청 함수 (async def web_hook_send)를 제거합니다
-
-
 
     def insert_list(self, arr):
         setattr(self, "menu", arr)
@@ -105,9 +106,13 @@ class MyRouter(BehaviorModelExecutor):
         gen.insert_list(menu)
         ss.get_engine("first").register_entity(gen)
         ss.get_engine("first").coupling_relation(None, "start", gen, "start")
-        ss.get_engine("first").insert_external_event("start", None)
-        self.output()
-        await ss.get_engine("first").simulate()
+
+        while(True):
+            ss.get_engine("first").insert_external_event("start", None)
+            gen.output()  # 값을 출력합니다.
+            await self.async_webhook_send(realdata)  # 출력 값을 웹훅으로 전송합니다.
+            time.sleep(1)  # 1초 기다립니다.
+            ss.get_engine("first").simulate(1)
 
     async def clear_data(self):
         ss = SystemSimulator()

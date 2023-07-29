@@ -26,6 +26,7 @@ class WebhookData(BaseModel):
     checkboxes: List[str]
     port: int
     username: str
+    time : str
 @app.get("/", response_class=HTMLResponse)
 async def get_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
@@ -34,18 +35,20 @@ async def get_root(request: Request):
 async def start_simulation(data: WebData):
     # 웹훅을 사용하여 시뮬레이션 처리를 시작합니다.
     print(data)
-    url = f"http://localhost:{data.port}/{data.username}"
     await my_router.simulate(data)
-    print("pass!")
-    return {"redirect_url" : url}
+    print("finish!")
+
 
 @app.post("/{username}")
-async def receive_webhook(data):
-    print("232323")
-    print(data)
-    # 필요한 처리를 수행한 후 응답을 반환합니다.
-    return {"status": "success"}
+async def receive_webhook(username: str, webhook_data: WebhookData):
+    print("웹훅 데이터 수신:")
+    print(f"체크박스: {webhook_data.checkboxes}")
+    print(f"포트: {webhook_data.port}")
+    print(f"사용자 이름: {webhook_data.username}")
+    print(webhook_data.time)
+
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8700)
+    uvicorn.run(app, host="127.0.0.1", port=8500)
