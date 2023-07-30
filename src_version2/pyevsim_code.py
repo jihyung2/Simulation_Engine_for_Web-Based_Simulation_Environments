@@ -58,7 +58,7 @@ class MyRouter(BehaviorModelExecutor):
         now = datetime.datetime.now()
         webhook_url = f"http://127.0.0.1:{request_data.port}/{request_data.username}"
         webhook_data = request_data.dict()
-        webhook_data["time"] = now
+        webhook_data["time"] = str(now)
         print(webhook_data)
 
         parsed_url = urlparse(webhook_url)

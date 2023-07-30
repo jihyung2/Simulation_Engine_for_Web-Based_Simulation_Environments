@@ -8,6 +8,7 @@
         }
     </style>
 </head>
+<link rel="icon" href="data:;base64, iVBOPRw0KGgo=">
 <body>
     <h1>Checkboxes and Input Transfer</h1>
     <form id="checkForm">
@@ -38,16 +39,61 @@
         <button type="submit">Run</button>
     </form>
 
+    <div id="resultContainer">
+        <!-- 결과를 표시할 컨테이너 -->
+    </div>
+
     <script>
-        document.getElementById("checkForm").onsubmit = function(event) {
+        const resultContainer = document.getElementById("resultContainer");
+
+        // WebSocket 연결을 생성합니다.
+        const socket = new WebSocket("ws://localhost:8700");
+
+        // WebSocket 연결이 열릴 때 발생하는 이벤트 핸들러
+        socket.onopen = function(event) {
+            console.log("WebSocket 연결이 열렸습니다.");
+        };
+
+        // WebSocket 메시지를 받을 때 발생하는 이벤트 핸들러
+        socket.onmessage = function(event) {
+            // 받은 데이터를 원하는 방식으로 표시합니다.
+            resultContainer.innerHTML = `<p>시뮬레이션 결과: ${event.data}</p>`;
+        };
+
+        // WebSocket 연결이 닫힐 때 발생하는 이벤트 핸들러
+        socket.onclose = function(event) {
+            console.log("WebSocket 연결이 닫혔습니다.");
+        };
+
+        document.getElementById("checkForm").onsubmit = async function(event) {
             event.preventDefault();
 
             const formData = new FormData(event.target);
+            const checkboxes = formData.getAll("checkbox");
             const port = formData.get("port");
             const username = formData.get("username");
 
-            const redirect_url = `http://localhost:${port}/${username}`;
-            window.location.href = redirect_url;
+            const sendData = {
+                checkboxes: checkboxes,
+                port: port,
+                username: username
+            };
+
+            const response = await fetch("/start_simulation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(sendData)
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const redirect_url = data.redirect_url;
+                window.location.href = redirect_url;
+            } else {
+                alert("Error: Could not send data!");
+            }
         };
     </script>
 </body>
