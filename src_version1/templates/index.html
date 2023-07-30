@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkboxes and Input Transfer</title>
+    <style>
+        .container {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<link rel="icon" href="data:;base64, iVBOPRw0KGgo=">
+<body>
+    <h1>Checkboxes and Input Transfer</h1>
+    <form id="checkForm">
+        <div class="container">
+            <input type="checkbox" id="A" name="checkbox" value="A">
+            <label for="A">A</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="B" name="checkbox" value="B">
+            <label for="B">B</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="C" name="checkbox" value="C">
+            <label for="C">C</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="D" name="checkbox" value="D">
+            <label for="D">D</label>
+        </div>
+        <div class="container">
+            <label for="port">Port number:</label>
+            <input type="number" id="port" name="port" required>
+        </div>
+        <div class="container">
+            <label for="username">Name:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <button type="submit">Run</button>
+    </form>
+
+    <!-- 결과를 표시할 컨테이너 -->
+    <div id="resultContainer"></div>
+    <button type="button" id="get_result_btn">Get Result</button>
+    <div id="resultArea"></div>
+
+    <script>
+        document.getElementById("checkForm").onsubmit = async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const checkboxes = formData.getAll("checkbox");
+            const port = formData.get("port");
+            const username = formData.get("username");
+
+            const sendData = {
+                checkboxes: checkboxes,
+                port: port,
+                username: username
+            };
+
+            const response = await fetch("/start_simulation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(sendData)
+            });
+        };
+
+        document.getElementById("get_result_btn").onclick = async function() {
+            const response = await fetch("/get_result");
+            const data = await response.json();
+            const resultElement = document.getElementById("resultArea");
+            if (data.result) {
+              resultElement.innerHTML = `웹훅 데이터 수신 결과:<br>
+                  체크박스: ${data.result.checkboxes}<br>
+                  포트: ${data.result.port}<br>
+                  사용자 이름: ${data.result.username}<br>
+                  시간: ${data.result.time}`;
+            } else {
+              resultElement.innerHTML = "결과가 없습니다."
+            }
+        };
+    </script>
+</body>
+</html>
