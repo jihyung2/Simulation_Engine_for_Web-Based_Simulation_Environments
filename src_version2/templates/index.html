@@ -39,32 +39,12 @@
         <button type="submit">Run</button>
     </form>
 
-    <div id="resultContainer">
-        <!-- 결과를 표시할 컨테이너 -->
-    </div>
+    <!-- 결과를 표시할 컨테이너 -->
+    <div id="resultContainer"></div>
+    <button type="button" id="get_result_btn">Get Result</button>
+    <div id="resultArea"></div>
 
     <script>
-        const resultContainer = document.getElementById("resultContainer");
-
-        // WebSocket 연결을 생성합니다.
-        const socket = new WebSocket("ws://localhost:8700");
-
-        // WebSocket 연결이 열릴 때 발생하는 이벤트 핸들러
-        socket.onopen = function(event) {
-            console.log("WebSocket 연결이 열렸습니다.");
-        };
-
-        // WebSocket 메시지를 받을 때 발생하는 이벤트 핸들러
-        socket.onmessage = function(event) {
-            // 받은 데이터를 원하는 방식으로 표시합니다.
-            resultContainer.innerHTML = `<p>시뮬레이션 결과: ${event.data}</p>`;
-        };
-
-        // WebSocket 연결이 닫힐 때 발생하는 이벤트 핸들러
-        socket.onclose = function(event) {
-            console.log("WebSocket 연결이 닫혔습니다.");
-        };
-
         document.getElementById("checkForm").onsubmit = async function(event) {
             event.preventDefault();
 
@@ -86,13 +66,20 @@
                 },
                 body: JSON.stringify(sendData)
             });
+        };
 
-            if (response.ok) {
-                const data = await response.json();
-                const redirect_url = data.redirect_url;
-                window.location.href = redirect_url;
+        document.getElementById("get_result_btn").onclick = async function() {
+            const response = await fetch("/get_result");
+            const data = await response.json();
+            const resultElement = document.getElementById("resultArea");
+            if (data.result) {
+              resultElement.innerHTML = `웹훅 데이터 수신 결과:<br>
+                  체크박스: ${data.result.checkboxes}<br>
+                  포트: ${data.result.port}<br>
+                  사용자 이름: ${data.result.username}<br>
+                  시간: ${data.result.time}`;
             } else {
-                alert("Error: Could not send data!");
+              resultElement.innerHTML = "결과가 없습니다."
             }
         };
     </script>
