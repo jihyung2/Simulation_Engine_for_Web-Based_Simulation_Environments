@@ -42,9 +42,6 @@ async def get_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 def simulate_process(request_data, result_queue):
-    # 이곳에 시뮬레이션 로직을 구현
-    # 시뮬레이션 결과를 result_queue에 넣음
-    # 예시로 단순히 request_data를 그대로 전달하는 예시
     abc = my_router.simulate(request_data)
     result_queue.put(abc)
 
@@ -62,10 +59,6 @@ async def start_simulation(request: Request):
         process = Process(target=simulate_process, args=(data, result_queue))
         process.start()
         processes.append(process)
-
-    # 모든 프로세스가 종료될 때까지 대기
-    for process in processes:
-        process.join()
 
     # 시뮬레이션 결과를 가져옴
     simulation_results = []
