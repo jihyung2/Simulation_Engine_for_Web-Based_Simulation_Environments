@@ -78,8 +78,26 @@ class MyRouter(BehaviorModelExecutor):
         now = datetime.datetime.now()
         if self.menu[self.index] == str(a):
             if str(a) == "/api":
+                # 이벤트 발생시 여기 출력
+                def sync_webhook_send(request_data):
+                    now = datetime.datetime.now()
+                    webhook_url = f"http://127.0.0.1:{request_data['port']}/{request_data['username']}"
+                    webhook_data = request_data
+                    webhook_data["time"] = str(now)
+                    try:
+                        response = requests.post(webhook_url, json=webhook_data)
+                        if response.status_code == 200:
+                            print("성공")
+                        else:
+                            print("실패")
+                    except Exception as e:
+                        print(f"웹훅 요청 중 오류 발생: {e}")
+
+                thread = Thread(target=sync_webhook_send, args=(realdata,))
+                thread.start()
                 return self.menu[self.index], 100
             else:
+                #이벤트 없을때도 출력( 실험용 )
                 def sync_webhook_send(request_data):
                     now = datetime.datetime.now()
                     webhook_url = f"http://127.0.0.1:{request_data['port']}/{request_data['username']}"
