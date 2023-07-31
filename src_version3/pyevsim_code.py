@@ -117,7 +117,7 @@ class MyRouter(BehaviorModelExecutor):
     def sync_webhook_send(self, request_data):
         asyncio.run(self.async_webhook_send(request_data))
 
-    async def simulate(self, request_data):
+    def simulate(self, request_data):
         global a
         global realdata
         realdata = request_data
