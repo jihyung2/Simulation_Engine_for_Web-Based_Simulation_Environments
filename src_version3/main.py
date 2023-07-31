@@ -62,6 +62,7 @@ async def start_simulation(request: Request):
 
     # 시뮬레이션 결과를 가져옴
     simulation_results = []
+
     while not result_queue.empty():
         simulation_result = result_queue.get()
         simulation_results.append(simulation_result)

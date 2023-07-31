@@ -21,15 +21,6 @@ import pyevsim
 app = FastAPI()
 global a
 global realdata
-a = "dummy data"
-
-async def simulate(data):
-    tasks = [simulate_one(data_item) for data_item in data]
-    await asyncio.gather(*tasks)
-
-async def simulate_one(data_item):
-    instance = MyRouter(0, Infinite, "Gen", "first")
-    await instance.simulate(data_item)
 
 class MyRouter(BehaviorModelExecutor):
     def __init__(self, instance_time, destruct_time, name, engine_name):
@@ -131,7 +122,7 @@ class MyRouter(BehaviorModelExecutor):
         ss.get_engine("first").register_entity(gen)
         ss.get_engine("first").coupling_relation(None, "start", gen, "start")
         ss.get_engine("first").insert_external_event("start", None)
-        ss.get_engine("first").simulate(5)
+        ss.get_engine("first").simulate()
 
 
     async def clear_data(self):
