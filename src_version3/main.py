@@ -84,12 +84,7 @@ async def receive_webhook(username: str, webhook_data: WebhookData):
 
 @app.get("/get_result")
 async def get_result():
-    global webhook_result
-    if webhook_result:
-        data = webhook_result[-1]
-    else:
-        data = None
-    return JSONResponse(content={"result": data})
+    return {"result": webhook_result}
 
 
 if __name__ == "__main__":

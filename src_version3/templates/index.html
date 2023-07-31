@@ -115,14 +115,24 @@
             const response = await fetch("/get_result");
             const data = await response.json();
             const resultElement = document.getElementById("resultArea");
-            if (data.result) {
-              resultElement.innerHTML = `웹훅 데이터 수신 결과:<br>
-                  체크박스: ${data.result.checkboxes}<br>
-                  포트: ${data.result.port}<br>
-                  사용자 이름: ${data.result.username}<br>
-                  시간: ${data.result.time}`;
+
+            if (data.result.length > 0) {
+                // 표 형식으로 렌더링
+                let tableHTML = "<table border='1'>";
+                tableHTML += "<tr><th>체크박스</th><th>포트</th><th>사용자 이름</th><th>시간</th></tr>";
+                for (const item of data.result) {
+                    const checkboxes = item.checkboxes.join(", ");
+                    const port = item.port;
+                    const username = item.username;
+                    const time = item.time;
+
+                    tableHTML += `<tr><td>${checkboxes}</td><td>${port}</td><td>${username}</td><td>${time}</td></tr>`;
+                }
+                tableHTML += "</table>";
+
+                resultElement.innerHTML = `웹훅 데이터 수신 결과:${tableHTML}`;
             } else {
-              resultElement.innerHTML = "결과가 없습니다."
+                resultElement.innerHTML = "결과가 없습니다."
             }
         };
     </script>
