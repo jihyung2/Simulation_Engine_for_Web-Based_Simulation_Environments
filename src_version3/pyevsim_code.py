@@ -116,25 +116,6 @@ class MyRouter(BehaviorModelExecutor):
                 thread.start()
                 return self.menu[self.index], 0
 
-
-    async def async_webhook_send(self, request_data):
-        now = datetime.datetime.now()
-        webhook_url = f"http://127.0.0.1:{request_data.port}/{request_data.username}"
-        webhook_data = request_data.dict()
-        webhook_data["time"] = str(now)
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(webhook_url, json=webhook_data)
-                if response.status_code == 200:
-                    print("성공")
-                else:
-                    print("실패")
-        except Exception as e:
-            print(f"웹훅 요청 중 오류 발생: {e.__class__.__name__} - {e}")
-
-    def sync_webhook_send(self, request_data):
-        asyncio.run(self.async_webhook_send(request_data))
-
     def simulate(self, request_data):
         global a
         global realdata
