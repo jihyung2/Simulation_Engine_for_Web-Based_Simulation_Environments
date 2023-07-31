@@ -21,7 +21,7 @@ import pyevsim
 app = FastAPI()
 global a
 global realdata
-
+a = "dummy"
 class MyRouter(BehaviorModelExecutor):
     def __init__(self, instance_time, destruct_time, name, engine_name):
         super().__init__(instance_time, destruct_time, name, engine_name)
@@ -38,17 +38,16 @@ class MyRouter(BehaviorModelExecutor):
         now = datetime.datetime.now()
         self.index = 0
         self.item_list = []
-        print("==========================")
 
         if hasattr(self, "menu"):
             for i in range(len(self.menu)):
                 self._cur_state, self.temp = self.int_trans()
                 self.item_list.append(int(self.temp))
                 self.index += 1
-
-            print(self.menu)
-            print(self.item_list)
-            print(now)
+            print("==========================\n"
+                  f"{self.menu}\n"
+                  f"{self.item_list}\n"
+                  f"{now}")
             self.put_db(self.item_list)
 
 

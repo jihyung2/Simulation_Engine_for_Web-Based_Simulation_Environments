@@ -75,11 +75,11 @@ async def start_simulation(request: Request):
 @app.post("/{username}")
 async def receive_webhook(username: str, webhook_data: WebhookData):
     global webhook_result
-    print("웹훅 데이터 수신:")
-    print(f"체크박스: {webhook_data.checkboxes}")
-    print(f"포트: {webhook_data.port}")
-    print(f"사용자 이름: {webhook_data.username}")
-    print(webhook_data.time)
+    print("웹훅 데이터 수신:\n"
+          f"체크박스: {webhook_data.checkboxes}\n"
+          f"포트: {webhook_data.port}\n"
+          f"사용자 이름: {webhook_data.username}\n"
+          f"{webhook_data.time}")
     webhook_result.append(webhook_data.dict())
 
 
