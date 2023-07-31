@@ -82,8 +82,8 @@ class MyRouter(BehaviorModelExecutor):
             else:
                 def sync_webhook_send(request_data):
                     now = datetime.datetime.now()
-                    webhook_url = f"http://127.0.0.1:{request_data.port}/{request_data.username}"
-                    webhook_data = request_data.dict()
+                    webhook_url = f"http://127.0.0.1:{request_data['port']}/{request_data['username']}"
+                    webhook_data = request_data
                     webhook_data["time"] = str(now)
                     try:
                         response = requests.post(webhook_url, json=webhook_data)
