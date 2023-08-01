@@ -83,8 +83,7 @@ class MyRouter(BehaviorModelExecutor):
                     except Exception as e:
                         print(f"웹훅 요청 중 오류 발생: {e}")
 
-                thread = Thread(target=sync_webhook_send, args=(realdata,))
-                thread.start()
+                sync_webhook_send(realdata)
                 return self.menu[self.index], 100
             else:
                 #이벤트 없을때도 출력( 실험용 )
@@ -101,9 +100,11 @@ class MyRouter(BehaviorModelExecutor):
                             print("실패")
                     except Exception as e:
                         print(f"웹훅 요청 중 오류 발생: {e}")
-
-                thread = Thread(target=sync_webhook_send, args=(realdata,))
-                thread.start()
+                #쓰레드 형식으로 하지 않아도 동기식으로 작동되지 않아 블로킹되지 않기 때문에 그냥 사용해도 가능하다.
+                #괜히 쓰레드 사용해서 더 낭비만 하지말고 정석으로 이벤트 발생 -> 웹훅 방식 사용
+                #thread = Thread(target=sync_webhook_send, args=(realdata,))
+                #thread.start()
+                sync_webhook_send(realdata)
                 return self.menu[self.index], 0
 
     def simulate(self, request_data):
