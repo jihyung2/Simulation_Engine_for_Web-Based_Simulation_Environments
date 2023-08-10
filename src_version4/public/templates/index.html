@@ -110,31 +110,66 @@
                 body: JSON.stringify(simulationData.instances)
             });
         };
+        if (window.WebSocket) {
+          // 웹 서버에 웹소켓 연결 설정
+          webSocket = new WebSocket('ws://' + location.host + '/ws');
 
-        document.getElementById("get_result_btn").onclick = async function() {
-            const response = await fetch("/get_result");
-            const data = await response.json();
-            const resultElement = document.getElementById("resultArea");
+          // 서버에서 메시지를 수신할 때 실행되는 이벤트 설정
+          webSocket.onmessage = function (event) {
+            // 결과 출력 구성
+            const resultElement = document.getElementById('resultArea');
 
-            if (data.result.length > 0) {
-                // 표 형식으로 렌더링
-                let tableHTML = "<table border='1'>";
-                tableHTML += "<tr><th>체크박스</th><th>포트</th><th>사용자 이름</th><th>시간</th></tr>";
-                for (const item of data.result) {
-                    const checkboxes = item.checkboxes.join(", ");
-                    const port = item.port;
-                    const username = item.username;
-                    const time = item.time;
+            // JSON 문자열로부터 데이터 파싱
+            const newData = JSON.parse(event.data);
 
-                    tableHTML += `<tr><td>${checkboxes}</td><td>${port}</td><td>${username}</td><td>${time}</td></tr>`;
-                }
-                tableHTML += "</table>";
+            // 테이블을 만들고 헤더 생성
+            const table = document.createElement('table');
+            table.setAttribute('border', '1');
+            const thead = document.createElement('thead');
+            const tr = document.createElement('tr');
 
-                resultElement.innerHTML = `웹훅 데이터 수신 결과:${tableHTML}`;
-            } else {
-                resultElement.innerHTML = "결과가 없습니다."
-            }
-        };
+            const thCheckboxes = document.createElement('th');
+            thCheckboxes.textContent = '체크박스';
+            tr.appendChild(thCheckboxes);
+
+            const thUsername = document.createElement('th');
+            thUsername.textContent = '사용자 이름';
+            tr.appendChild(thUsername);
+
+            const thTime = document.createElement('th'); // 시간 헤더 추가
+            thTime.textContent = '시간';
+            tr.appendChild(thTime); // 시간 헤더 추가
+
+            thead.appendChild(tr);
+            table.appendChild(thead);
+
+            // 바디 생성
+            const tbody = document.createElement('tbody');
+            const newRow = document.createElement('tr');
+
+            const tdCheckboxes = document.createElement('td');
+            tdCheckboxes.textContent = newData.checkboxes.join(', ');
+            newRow.appendChild(tdCheckboxes);
+
+            const tdUsername = document.createElement('td');
+            tdUsername.textContent = newData.username;
+            newRow.appendChild(tdUsername);
+
+            const tdTime = document.createElement('td'); // 시간 셀 추가
+            tdTime.textContent = newData.time; // 서버에서 받은 시간 표시
+            newRow.appendChild(tdTime); // 시간 셀 추가
+
+            tbody.appendChild(newRow);
+            table.appendChild(tbody);
+
+            // 이전 결과는 유지한 상태에서 새로운 결과 테이블을 추가
+            resultElement.appendChild(table);
+          };
+        } else {
+          // 웹 브라우저에서 웹소켓을 지원하지 않는 경우
+          document.getElementById('resultArea').innerText = '이 브라우저는 웹소켓을 지원하지 않습니다!';
+        }
+
     </script>
 </body>
 </html>
