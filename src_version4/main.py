@@ -3,13 +3,14 @@ import importlib
 import asyncio
 from multiprocessing import Process, Queue
 
-from fastapi import BackgroundTasks
+from fastapi import BackgroundTasks, File
 from fastapi import FastAPI, Body, WebSocket, WebSocketDisconnect, websockets
 from typing import List
 from pydantic import BaseModel
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi import FastAPI, Request, Form, APIRouter
+from fastapi.staticfiles import StaticFiles
 
 pyevsim_code = importlib.import_module("pyevsim_code")
 MyRouter = pyevsim_code.MyRouter
@@ -18,7 +19,6 @@ Infinite = pyevsim_code.Infinite
 my_router = MyRouter(0, Infinite, "MyRouter", "Engine1")
 
 app = FastAPI()
-templates = Jinja2Templates(directory="templates")
 
 
 class WebhookData(BaseModel):
@@ -29,11 +29,6 @@ class WebhookData(BaseModel):
 
 
 webhook_result = []
-
-
-@app.get("/", response_class=HTMLResponse)
-async def get_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
 
 def simulate_process(request_data, result_queue):
     abc = my_router.simulate(request_data)
@@ -63,24 +58,7 @@ async def start_simulation(request: Request):
 
     print("All Simulations Complete!")
     print("Simulation Results:", simulation_results)
-    return {"message": "All Simulations Complete!"}
-
-#
-# @app.post("/{username}")
-# async def receive_webhook(username: str, webhook_data: WebhookData):
-#     global webhook_result
-#     print("웹훅 데이터 수신:\n"
-#           f"체크박스: {webhook_data.checkboxes}\n"
-#           f"포트: {webhook_data.port}\n"
-#           f"사용자 이름: {webhook_data.username}\n"
-#           f"{webhook_data.time}")
-#     webhook_result.append(webhook_data.dict())
-#
-#
-# @app.get("/get_result")
-# async def get_result():
-#     return {"result": webhook_result}
-
+    return {"message": "All Simulations run!"}
 
 if __name__ == "__main__":
     import uvicorn
