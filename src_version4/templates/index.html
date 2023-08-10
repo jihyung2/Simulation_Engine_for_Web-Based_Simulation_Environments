@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkboxes and Input Transfer</title>
+    <style>
+        .container {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<link rel="icon" href="data:;base64, iVBOPRw0KGgo=">
+<body>
+    <h1>Checkboxes and Input Transfer</h1>
+    <form id="checkForm">
+        <div class="container">
+            <input type="checkbox" id="A" name="checkbox" value="A">
+            <label for="A">A</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="B" name="checkbox" value="B">
+            <label for="B">B</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="C" name="checkbox" value="C">
+            <label for="C">C</label>
+        </div>
+        <div class="container">
+            <input type="checkbox" id="D" name="checkbox" value="D">
+            <label for="D">D</label>
+        </div>
+        <div class="container">
+            <label for="port">Port number:</label>
+            <input type="number" id="port" name="port" required>
+        </div>
+        <div class="container">
+            <label for="username">Name:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <button type="button" id="add_btn">Add</button>
+        <button type="button" id="run_btn">Run</button>
+    </form>
+
+    <h2>저장된 목록</h2>
+    <table id="savedTable">
+        <thead>
+            <tr>
+                <th>체크박스</th>
+                <th>포트</th>
+                <th>이름</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <!-- 결과를 표시할 컨테이너 -->
+    <div id="resultContainer"></div>
+    <button type="button" id="get_result_btn">Get Result</button>
+    <div id="resultArea"></div>
+
+    <script>
+        // 네임스페이스 정의
+        const simulationData = {
+            instances: []
+        }
+
+        function updateTable() {
+            const tbody = document.querySelector("#savedTable tbody");
+            tbody.innerHTML = "";
+            simulationData.instances.forEach(instance => {
+                const row = document.createElement("tr");
+
+                const checkboxesCell = document.createElement("td");
+                checkboxesCell.textContent = instance.checkboxes.join(", ");
+                row.appendChild(checkboxesCell);
+
+                const portCell = document.createElement("td");
+                portCell.textContent = instance.port;
+                row.appendChild(portCell);
+
+                const usernameCell = document.createElement("td");
+                usernameCell.textContent = instance.username;
+                row.appendChild(usernameCell);
+
+                tbody.appendChild(row);
+            });
+        }
+
+        document.getElementById("add_btn").onclick = function() {
+            const checkboxes = [...document.querySelectorAll('input[type="checkbox"]:checked')].map(checkbox => checkbox.value);
+            const port = document.getElementById("port").value;
+            const username = document.getElementById("username").value;
+
+            // 저장
+            simulationData.instances.push({
+                checkboxes: checkboxes,
+                port: port,
+                username: username
+            });
+
+            updateTable(); // 테이블 업데이트
+        };
+
+        document.getElementById("run_btn").onclick = async function() {
+            const response = await fetch("/start_simulation", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(simulationData.instances)
+            });
+        };
+
+        document.getElementById("get_result_btn").onclick = async function() {
+            const response = await fetch("/get_result");
+            const data = await response.json();
+            const resultElement = document.getElementById("resultArea");
+
+            if (data.result.length > 0) {
+                // 표 형식으로 렌더링
+                let tableHTML = "<table border='1'>";
+                tableHTML += "<tr><th>체크박스</th><th>포트</th><th>사용자 이름</th><th>시간</th></tr>";
+                for (const item of data.result) {
+                    const checkboxes = item.checkboxes.join(", ");
+                    const port = item.port;
+                    const username = item.username;
+                    const time = item.time;
+
+                    tableHTML += `<tr><td>${checkboxes}</td><td>${port}</td><td>${username}</td><td>${time}</td></tr>`;
+                }
+                tableHTML += "</table>";
+
+                resultElement.innerHTML = `웹훅 데이터 수신 결과:${tableHTML}`;
+            } else {
+                resultElement.innerHTML = "결과가 없습니다."
+            }
+        };
+    </script>
+</body>
+</html>

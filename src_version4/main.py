@@ -65,20 +65,21 @@ async def start_simulation(request: Request):
     print("Simulation Results:", simulation_results)
     return {"message": "All Simulations Complete!"}
 
-@app.post("/{username}")
-async def receive_webhook(username: str, webhook_data: WebhookData):
-    global webhook_result
-    print("웹훅 데이터 수신:\n"
-          f"체크박스: {webhook_data.checkboxes}\n"
-          f"포트: {webhook_data.port}\n"
-          f"사용자 이름: {webhook_data.username}\n"
-          f"{webhook_data.time}")
-    webhook_result.append(webhook_data.dict())
-
-
-@app.get("/get_result")
-async def get_result():
-    return {"result": webhook_result}
+#
+# @app.post("/{username}")
+# async def receive_webhook(username: str, webhook_data: WebhookData):
+#     global webhook_result
+#     print("웹훅 데이터 수신:\n"
+#           f"체크박스: {webhook_data.checkboxes}\n"
+#           f"포트: {webhook_data.port}\n"
+#           f"사용자 이름: {webhook_data.username}\n"
+#           f"{webhook_data.time}")
+#     webhook_result.append(webhook_data.dict())
+#
+#
+# @app.get("/get_result")
+# async def get_result():
+#     return {"result": webhook_result}
 
 
 if __name__ == "__main__":
