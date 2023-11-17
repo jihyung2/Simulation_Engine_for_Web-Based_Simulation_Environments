@@ -52,7 +52,7 @@
 ![2023 이지형_포스터_최종본_page-0001](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/6c4f1c53-2856-4dd2-998c-478f4871ce00)
 
 - ### 동작 과정
-    - ![작동방식2](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/0ed6dad7-12a7-4f98-8589-7f524f94a50e)
+     ![작동방식2](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/0ed6dad7-12a7-4f98-8589-7f524f94a50e)
     - 사용자가 시뮬레이션 구성정보를 입력 후 실행 버튼을 클릭하면 웹 서버가 구성 정보를 실행 서버로 전달
     - 실행 서버는 전달받은 시뮬레이션 구성정보를 바탕으로 독립적인 시뮬레이션 모델을 생성 후 실행
     - 시뮬레이션 동작 중 이벤트 발생시 웹 훅을 통해 웹 서버로 데이터 전달
