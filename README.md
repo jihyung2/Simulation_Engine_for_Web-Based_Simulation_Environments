@@ -48,8 +48,9 @@
   - 웹 기반 시뮬레이션 인터페이스와 시뮬레이션 엔진은 이산사건 시스템 형식론 기반으로 구현된 모델을 조합하여 시뮬레이션을 구성하고 실행할 수 있도록 함으로써, 별도의 어플리케이션을 설치하고 실행하는 환경적 제약사항 극복
   
 ## Project Outcome
-- ### 2023년 한국전기전자학회 학술대회 포스터
-![2023 이지형_포스터_최종본_page-0001](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/6c4f1c53-2856-4dd2-998c-478f4871ce00)
+- ### 2023년 한국전기전자학회 학술대회 논문
+![웹 기반 시뮬레이션 환경을 위한 시뮬레이션 엔진의 설계 및 구현_이지형논문001](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/c3243f1b-5a1e-41f6-9aed-529be301564c)
+![웹 기반 시뮬레이션 환경을 위한 시뮬레이션 엔진의 설계 및 구현_이지형논문002](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/f45867d2-d10b-411c-ba47-c7852f0e203c)
 
 - ### 동작 과정
      ![작동방식2](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/0ed6dad7-12a7-4f98-8589-7f524f94a50e)
