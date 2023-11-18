@@ -52,6 +52,12 @@
 ![웹 기반 시뮬레이션 환경을 위한 시뮬레이션 엔진의 설계 및 구현_이지형논문001](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/c3243f1b-5a1e-41f6-9aed-529be301564c)
 ![웹 기반 시뮬레이션 환경을 위한 시뮬레이션 엔진의 설계 및 구현_이지형논문002](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/f45867d2-d10b-411c-ba47-c7852f0e203c)
 
+- ### 2023년 한국전기전자학회 포스터 발표
+![2023 이지형_포스터_최종본_page-0001](https://github.com/jihyung2/FastAPI_Pyevsim/assets/108830942/80d95a67-f982-4359-a0d5-dfea449a0ec8)
+
+- ### 2023년 한국전기전자학회 참가확인서
+![참가신청서](https://github.com/jihyung2/FastAPI_Pyevsim/assets/108830942/ccb96d36-122a-4dbe-82bc-2e59ee30c854)
+
 - ### 동작 과정
      ![작동방식2](https://github.com/jihyung2/Simulation_Engine_for_Web-Based_Simulation_Environments/assets/108830942/0ed6dad7-12a7-4f98-8589-7f524f94a50e)
     - 사용자가 시뮬레이션 구성정보를 입력 후 실행 버튼을 클릭하면 웹 서버가 구성 정보를 실행 서버로 전달
